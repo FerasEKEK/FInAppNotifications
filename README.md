@@ -4,7 +4,7 @@ In app notifications for ios written using swift. Supports textfield, images, an
 
 **What it looks like**
 =
-gif
+![](demo.gif)
 
 
 **Usage**
