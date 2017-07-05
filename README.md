@@ -49,8 +49,7 @@ In app notifications for ios written using swift. Supports textfield, images, an
 
 **How to add**
 =
--
-Just drag the project files to your project.
+-Just drag the project files to your project.
 
 **License**
 =
