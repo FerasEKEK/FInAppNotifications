@@ -2,8 +2,8 @@
 //  FNotification.swift
 //  FInAppNotification
 //
-//  Created by Apple on 7/4/17.
-//  Copyright © 2017 *TechnologySARL. All rights reserved.
+//  Created by Firas Al Khatib Al Khalidi on 7/4/17.
+//  Copyright © 2017 Firas Al Khatib Al Khalidi. All rights reserved.
 //
 
 import UIKit
