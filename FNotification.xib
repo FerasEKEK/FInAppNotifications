@@ -36,7 +36,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SFu-pB-uOW">
-                    <rect key="frame" x="172.5" y="81" width="30" height="2"/>
+                    <rect key="frame" x="172.5" y="84" width="30" height="2"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="2" id="1xm-KR-02x"/>
@@ -50,7 +50,7 @@
                 <constraint firstItem="ZVl-9d-oV7" firstAttribute="top" secondItem="Kgw-c2-l5q" secondAttribute="top" id="9lN-W0-ZAQ"/>
                 <constraint firstAttribute="trailing" secondItem="661-vR-5gr" secondAttribute="trailing" constant="8" id="KZb-Wt-kGt"/>
                 <constraint firstItem="ZVl-9d-oV7" firstAttribute="leading" secondItem="Kgw-c2-l5q" secondAttribute="trailing" constant="8" id="LA9-fJ-HPb"/>
-                <constraint firstItem="SFu-pB-uOW" firstAttribute="top" secondItem="661-vR-5gr" secondAttribute="bottom" constant="3" id="Mrn-2F-oQl"/>
+                <constraint firstItem="SFu-pB-uOW" firstAttribute="top" secondItem="661-vR-5gr" secondAttribute="bottom" constant="6" id="Mrn-2F-oQl"/>
                 <constraint firstItem="Kgw-c2-l5q" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="OL3-86-fmu"/>
                 <constraint firstItem="661-vR-5gr" firstAttribute="leading" secondItem="Kgw-c2-l5q" secondAttribute="trailing" constant="8" id="UOB-Qc-Ual"/>
                 <constraint firstItem="SFu-pB-uOW" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Y34-5p-GSj"/>

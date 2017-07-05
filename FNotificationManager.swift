@@ -2,8 +2,8 @@
 //  FNotificationManager.swift
 //  FInAppNotification
 //
-//  Created by Firas Al Khatib Al Khalidi on 7/4/17.
-//  Copyright © 2017 Firas Al Khatib Al Khalidi. All rights reserved.
+//  Created by Apple on 7/4/17.
+//  Copyright © 2017 *TechnologySARL. All rights reserved.
 //
 
 import UIKit
@@ -36,6 +36,7 @@ class FNotificationManager: NSObject {
                 notificationTimer.invalidate()
                 notificationTimer = nil
             }
+            notification.extensionView?.isHidden = false
         case .changed:
             var translation = gesture.translation(in: notification)
             if notification.extensionView != nil && !notification.isExtended{

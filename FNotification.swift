@@ -2,15 +2,15 @@
 //  FNotification.swift
 //  FInAppNotification
 //
-//  Created by Firas Al Khatib Al Khalidi on 7/4/17.
-//  Copyright © 2017 Firas Al Khatib Al Khalidi. All rights reserved.
+//  Created by Apple on 7/4/17.
+//  Copyright © 2017 *TechnologySARL. All rights reserved.
 //
 
 import UIKit
 class FNotification: UIView {
     static let bounceOffset                 : CGFloat = 20
-    static let heightWithStatusBar          : CGFloat = 114
-    static let heightWithoutStatusBar       : CGFloat = 94
+    static let heightWithStatusBar          : CGFloat = 120
+    static let heightWithoutStatusBar       : CGFloat = 100
     static let topConstraintWithStatusBar   : CGFloat = 48
     static let topConstraintWithoutStatusBar: CGFloat = 28
     static let textFieldExtensionViewHeight : CGFloat = 40
@@ -141,6 +141,9 @@ class FNotification: UIView {
     func orientationChanged(){
         frame.origin.y = -20
         frame.size.height = height
+        if !isExtended{
+            extensionView?.isHidden = true
+        }
         guard extensionView != nil else{
             return
         }
