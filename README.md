@@ -3,6 +3,8 @@
 In app notifications for ios written using swift. Supports textfield, images, and normal notifications 
 
 **What it looks like**
+=
+gif
 
 
 **Usage**
@@ -46,6 +48,7 @@ In app notifications for ios written using swift. Supports textfield, images, an
 - Swift 3.0
 
 **How to add**
+=
 -
 Just drag the project files to your project.
 
