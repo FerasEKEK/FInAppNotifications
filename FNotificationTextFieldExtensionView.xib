@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="FNotificationTextFieldExtensionView" customModule="FInAppNotification" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="181"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4aL-Vv-6nb">
+                    <rect key="frame" x="331" y="0.0" width="36" height="181"/>
+                    <state key="normal" title="Send">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="sendButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="I4m-fi-AWU"/>
+                    </connections>
+                </button>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="IwU-S3-yXo">
+                    <rect key="frame" x="8" y="0.0" width="315" height="181"/>
+                    <nil key="textColor"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="IwU-S3-yXo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="1gu-rH-rf6"/>
+                <constraint firstAttribute="bottom" secondItem="IwU-S3-yXo" secondAttribute="bottom" id="Bqz-LA-BVD"/>
+                <constraint firstItem="4aL-Vv-6nb" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="CsL-UZ-Afv"/>
+                <constraint firstItem="4aL-Vv-6nb" firstAttribute="leading" secondItem="IwU-S3-yXo" secondAttribute="trailing" constant="8" id="LT0-km-TE9"/>
+                <constraint firstAttribute="bottom" secondItem="4aL-Vv-6nb" secondAttribute="bottom" id="cHh-K0-pP4"/>
+                <constraint firstItem="IwU-S3-yXo" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="gII-zg-s8j"/>
+                <constraint firstAttribute="trailing" secondItem="4aL-Vv-6nb" secondAttribute="trailing" constant="8" id="ipc-yy-5kd"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="sendButton" destination="4aL-Vv-6nb" id="oge-8g-KYw"/>
+                <outlet property="textField" destination="IwU-S3-yXo" id="Uxj-X9-FfU"/>
+            </connections>
+            <point key="canvasLocation" x="85.5" y="-189.5"/>
+        </view>
+    </objects>
+</document>
