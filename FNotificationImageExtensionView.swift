@@ -26,12 +26,12 @@ class FNotificationImageExtensionView: FNotificationExtensionView {
     
     private func setupImageView(){
         self.addSubview(imageView)
-        imageView.translatesAutoresizingMaskIntoConstraints               = false
-        imageView.topAnchor.constraint(equalTo: topAnchor).isActive       = true
-        imageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 8).isActive     = true
-        imageView.rightAnchor.constraint(equalTo: rightAnchor, constant: -8).isActive   = true
-        imageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints                           = false
+        imageView.topAnchor.constraint(equalTo: topAnchor).isActive                   = true
+        imageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 8).isActive    = true
+        imageView.rightAnchor.constraint(equalTo: rightAnchor, constant: -8).isActive = true
+        imageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive             = true
+        imageView.contentMode                                                         = .scaleAspectFill
+        imageView.clipsToBounds                                                       = true
     }
 }
