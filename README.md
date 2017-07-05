@@ -1,4 +1,4 @@
-**NFLoadingController** 
+**FInAppNotifications** 
 ===
 In app notifications for ios written using swift. Supports textfield, images, and normal notifications 
 
