@@ -54,6 +54,8 @@ class ViewController: UIViewController {
             }
             FNotificationManager.shared.show(audioPlayerNotificationWithTitleText: "Firas", subtitleText: "Has sent you an audio message", image: #imageLiteral(resourceName: "pp"), extensionAudioUrl: path!, notificationWasTapped: {
                 print("Audio notification was tapped")
+            }, didPlayRecording:{
+                print("Audio recording was played for the first time")
             })
 
         }

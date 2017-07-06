@@ -11,6 +11,7 @@ import AVFoundation
 class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
     var audioPlayer                   : AVPlayer!
     var timeObserver                  : Any?
+    var didPlayRecording              : (()-> Void)?
     var dataUrl: String!{
         didSet{
             guard dataUrl != nil else {
@@ -140,6 +141,8 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
         })
     }
     @IBAction func playPauseButtonPressed(_ sender: UIButton) {
+        didPlayRecording?()
+        didPlayRecording = nil
         if audioPlayer.rate != 0{
             audioPlayer.pause()
             playPauseButton.setImage(#imageLiteral(resourceName: "play"), for: .normal)

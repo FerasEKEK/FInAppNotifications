@@ -96,9 +96,10 @@ class FNotificationManager: NSObject {
         notification.backgroundColor              = settings.backgroundColor
     }
     
-    func show(audioPlayerNotificationWithTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, extensionAudioUrl: String, notificationWasTapped: (()-> Void)?){
+    func show(audioPlayerNotificationWithTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, extensionAudioUrl: String, notificationWasTapped: (()-> Void)?, didPlayRecording: (()-> Void)?){
         let audioPlayerExtension = UINib(nibName: "FNotificationVoicePlayerExtensionView", bundle: nil).instantiate(withOwner: nil, options: nil).first as! FNotificationVoicePlayerExtensionView
         audioPlayerExtension.dataUrl = extensionAudioUrl
+        audioPlayerExtension.didPlayRecording = didPlayRecording
         notification.extensionView = audioPlayerExtension
         if notificationTimer != nil{
             self.notificationTimer.invalidate()
