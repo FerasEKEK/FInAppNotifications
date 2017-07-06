@@ -19,13 +19,13 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
             }
             audioPlayer = AVPlayer(playerItem: AVPlayerItem(asset: AVAsset(url: URL(fileURLWithPath: dataUrl))))
             NotificationCenter.default.addObserver(self, selector: #selector(itemDidFinishPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: audioPlayer.currentItem!)
-            timeSlider.isEnabled      = true
-            playPauseButton.isEnabled = true
-            timeLabel.text = initialTimeString
-            addTimeObserver()
             timeSlider.minimumValue = 0
             timeSlider.maximumValue = Float(audioPlayer.currentItem!.asset.duration.seconds)
             timeSlider.value = Float(audioPlayer.currentTime().seconds)
+            timeSlider.isEnabled      = true
+            playPauseButton.isEnabled = true
+            addTimeObserver()
+            timeLabel.text = initialTimeString
             let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
             addGestureRecognizer(tapGestureRecognizer)
             tapGestureRecognizer.delegate = self
@@ -66,10 +66,6 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
         else{
             timeString = timeString + ":\(seconds)"
         }
-        if didFinishPlaying{
-            didFinishPlaying = false
-            return currentTimeString
-        }
         return timeString
     }
     private var currentTimeString: String{
@@ -88,6 +84,9 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
         }
         else{
             timeString = timeString + ":\(seconds)"
+        }
+        if audioPlayer.rate == 0 && seconds == 0{
+            return initialTimeString
         }
         return timeString
     }
