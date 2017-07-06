@@ -1,6 +1,6 @@
 **FInAppNotifications** 
 ===
-In app notifications for ios written using swift. Supports textfield, images, and normal notifications 
+In app notifications for ios written using swift. Supports textfield, images, audio, and normal notifications 
 
 **What it looks like**
 =
