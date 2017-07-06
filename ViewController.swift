@@ -19,26 +19,44 @@ class ViewController: UIViewController {
     
     @IBAction func buttonPressed(_ sender: Any) {
         let uuidString = UUID().uuidString
-        counter = (counter+1) % 3
+        counter = (counter+1) % 4
         if counter == 0{
-            FNotificationManager.shared.show(withTitleText: "Firas", subtitleText: uuidString, image: #imageLiteral(resourceName: "pp"), notificationWasTapped: {
-                print("Notification Tapped")
+            FNotificationManager.shared.show(withTitleText: "Firas",
+                                             subtitleText: uuidString,
+                                             image: #imageLiteral(resourceName: "pp"),
+                                             notificationWasTapped: {
+                                                print("Notification Tapped")
             })
         }
         else if counter == 1 {
-            FNotificationManager.shared.show(textFieldNotificationWithTitleText: "Firas", subtitleText: uuidString, image: #imageLiteral(resourceName: "pp"), notificationWasTapped: {
-                (sender as! UIButton).setTitle(uuidString, for: .normal)
+            FNotificationManager.shared.show(textFieldNotificationWithTitleText: "Firas",
+                                             subtitleText: uuidString,
+                                             image: #imageLiteral(resourceName: "pp"),
+                                             notificationWasTapped: {
+                                                (sender as! UIButton).setTitle(uuidString, for: .normal)
             }) { (text) in
                 (sender as! UIButton).setTitle(text, for: .normal)
             }
         }
-        else{
-            FNotificationManager.shared.show(imageNotificationWithTitleText: "Firas", subtitleText: "Sent you an image", image: #imageLiteral(resourceName: "pp"), extensionImage: #imageLiteral(resourceName: "bunnyrabbit"), notificationWasTapped: {
-                print("Image notification was tapped")
+        else if counter == 2{
+            FNotificationManager.shared.show(imageNotificationWithTitleText: "Firas",
+                                             subtitleText: "Sent you an image",
+                                             image: #imageLiteral(resourceName: "pp"),
+                                             extensionImage: #imageLiteral(resourceName: "bunnyrabbit"),
+                                             notificationWasTapped: {
+                                                print("Image notification was tapped")
             })
         }
+        else{
+            let path = Bundle.main.path(forResource: "demo", ofType: "mp3")
+            guard path != nil else{
+                return
+            }
+            FNotificationManager.shared.show(audioPlayerNotificationWithTitleText: "Firas", subtitleText: "Has sent you an audio message", image: #imageLiteral(resourceName: "pp"), extensionAudioUrl: path!, notificationWasTapped: {
+                print("Audio notification was tapped")
+            })
 
-    
+        }
     }
 }
 

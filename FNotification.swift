@@ -8,28 +8,39 @@
 
 import UIKit
 class FNotification: UIView {
-    static let bounceOffset                 : CGFloat = 20
-    static let heightWithStatusBar          : CGFloat = 120
-    static let heightWithoutStatusBar       : CGFloat = 100
-    static let topConstraintWithStatusBar   : CGFloat = 48
-    static let topConstraintWithoutStatusBar: CGFloat = 28
-    static let textFieldExtensionViewHeight : CGFloat = 40
-    static var imageViewExtensionViewHeight : CGFloat {
+    static let bounceOffset                  : CGFloat = 20
+    static let heightWithStatusBar           : CGFloat = 120
+    static let heightWithoutStatusBar        : CGFloat = 100
+    static let topConstraintWithStatusBar    : CGFloat = 48
+    static let topConstraintWithoutStatusBar : CGFloat = 28
+    static let textFieldExtensionViewHeight  : CGFloat = 40
+    static let audioPlayerExtensionViewHeight: CGFloat = 100
+    static var imageViewExtensionViewHeight  : CGFloat {
         return 200
     }
-    static let extensionViewTopConstraint   : CGFloat = 16
+    static let extensionViewTopConstraint    : CGFloat = 16
 
-    @IBOutlet weak var imageView            : UIImageView!
-    @IBOutlet weak var topConstraint        : NSLayoutConstraint!
-    @IBOutlet weak var titleLabel           : UILabel!
-    @IBOutlet weak var subtitleLabel        : UILabel!
+    @IBOutlet weak var imageView             : UIImageView!
+    @IBOutlet weak var topConstraint         : NSLayoutConstraint!
+    @IBOutlet weak var titleLabel            : UILabel!
+    @IBOutlet weak var subtitleLabel         : UILabel!
     
     @IBOutlet weak var extensionViewIndicator: UIView!
     
-    var isExtended                          = false
-    var extensionView                       : FNotificationExtensionView?{
+    var isExtended                           = false
+    var extensionView                        : FNotificationExtensionView?{
         didSet{
             oldValue?.removeFromSuperview()
+            if oldValue != nil{
+                if let audioExtension = oldValue as? FNotificationVoicePlayerExtensionView{
+                    audioExtension.audioPlayer.pause()
+                    if audioExtension.timeObserver != nil{
+                        audioExtension.audioPlayer.removeTimeObserver(audioExtension.timeObserver!)
+                    }
+                    audioExtension.timeObserver = nil
+                    audioExtension.audioPlayer = nil
+                }
+            }
             isExtended = false
             extensionViewIndicator.isHidden = true
             
@@ -50,6 +61,8 @@ class FNotification: UIView {
             case is FNotificationImageExtensionView:
                 extensionView?.heightAnchor.constraint(equalToConstant: FNotification.imageViewExtensionViewHeight).isActive = true
                 break
+            case is FNotificationVoicePlayerExtensionView:
+                extensionView?.heightAnchor.constraint(equalToConstant: FNotification.audioPlayerExtensionViewHeight).isActive = true
             default:
                 break
             }
@@ -134,6 +147,9 @@ class FNotification: UIView {
             else if extensionView! is FNotificationImageExtensionView{
                 extensionViewHeight = FNotification.imageViewExtensionViewHeight + 16
             }
+            else if extensionView! is FNotificationVoicePlayerExtensionView{
+                extensionViewHeight = FNotification.audioPlayerExtensionViewHeight + 16
+            }
         }
         let height = notificationHeight + extensionViewHeight
         return height
@@ -141,9 +157,6 @@ class FNotification: UIView {
     func orientationChanged(){
         frame.origin.y = -20
         frame.size.height = height
-        if !isExtended{
-            extensionView?.isHidden = true
-        }
         guard extensionView != nil else{
             return
         }

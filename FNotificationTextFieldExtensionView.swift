@@ -3,7 +3,7 @@
 //  FInAppNotification
 //
 //  Created by Firas Al Khatib Al Khalidi on 7/5/17.
-//  Copyright © 2017 Firas Al Khatib Al Khalidi. All rights reserved.
+//  Copyright © 2017 *TechnologySARL. All rights reserved.
 //
 
 import UIKit
