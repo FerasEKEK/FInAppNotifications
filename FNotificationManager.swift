@@ -13,10 +13,12 @@ class FNotificationManager: NSObject {
     fileprivate var tapGestureRecognizer         : UITapGestureRecognizer!
     private var notificationTimer                : Timer!
     private var settings                         : FNotificationSettings!
-    private var notification                     : FNotification = UINib(nibName: "FNotification",
+    var pauseBetweenNotifications                : TimeInterval = 1
+    private var notificationView                     : FNotificationView = UINib(nibName: "FNotificationView",
                                                     bundle: nil).instantiate(withOwner: nil,
-                                                                             options: nil).first as! FNotification
+                                                                             options: nil).first as! FNotificationView
     private var tapCompletion                    : (()-> Void)?
+    private var notificationQueue                : [(FNotification, FNotificationExtensionView?)] = []
     private override init(){
         super.init()
         set(newSettings: .defaultStyle)
@@ -24,8 +26,8 @@ class FNotificationManager: NSObject {
         tapGestureRecognizer          = UITapGestureRecognizer(target: self, action: #selector(handleTap(gesture:)))
         dismissalPanGestureRecognizer.delegate = self
         tapGestureRecognizer.delegate = self
-        notification.addGestureRecognizer(dismissalPanGestureRecognizer)
-        notification.addGestureRecognizer(tapGestureRecognizer)
+        notificationView.addGestureRecognizer(dismissalPanGestureRecognizer)
+        notificationView.addGestureRecognizer(tapGestureRecognizer)
     }
     
     @objc func handlePan(gesture: UIPanGestureRecognizer){
@@ -37,40 +39,31 @@ class FNotificationManager: NSObject {
                 notificationTimer = nil
             }
         case .changed:
-            var translation = gesture.translation(in: notification)
-            if notification.extensionView != nil && !notification.isExtended{
-                translation.y = translation.y - FNotification.bounceOffset
-                notification.frame.origin.y = translation.y <= 0 ? translation.y : 0
+            var translation = gesture.translation(in: notificationView)
+            if notificationView.extensionView != nil && !notificationView.isExtended{
+                translation.y = translation.y - FNotificationView.bounceOffset
+                notificationView.frame.origin.y = translation.y <= 0 ? translation.y : 0
                 if translation.y > 0{
-                    var notificationHeight = FNotification.heightWithStatusBar
+                    var notificationHeight = FNotificationView.heightWithStatusBar
                     if UIApplication.shared.isStatusBarHidden{
-                        notificationHeight = FNotification.heightWithoutStatusBar
+                        notificationHeight = FNotificationView.heightWithoutStatusBar
                     }
-                    var accessoryViewHeight: CGFloat = 0
-                    if notification.extensionView! is FNotificationTextFieldExtensionView{
-                        accessoryViewHeight = FNotification.textFieldExtensionViewHeight
-                    }
-                    else if notification.extensionView is FNotificationImageExtensionView{
-                        accessoryViewHeight = FNotification.imageViewExtensionViewHeight
-                    }
-                    else if notification.extensionView is FNotificationVoicePlayerExtensionView{
-                        accessoryViewHeight = FNotification.audioPlayerExtensionViewHeight
-                    }
+                    let extensionViewHeight: CGFloat = notificationView.extensionView!.height
                     let fullHeight: CGFloat = notificationHeight + translation.y
-                    notification.frame.size.height = fullHeight <= notificationHeight + accessoryViewHeight + 16 ? fullHeight : notificationHeight + accessoryViewHeight + 16
+                    notificationView.frame.size.height = fullHeight <= notificationHeight + extensionViewHeight + 16 ? fullHeight : notificationHeight + extensionViewHeight + 16
                 }
             }
             else{
-                translation.y = translation.y - FNotification.bounceOffset
-                notification.frame.origin.y = translation.y <= 0 ? translation.y : 0
+                translation.y = translation.y - FNotificationView.bounceOffset
+                notificationView.frame.origin.y = translation.y <= 0 ? translation.y : 0
             }
         case .ended:
-            if gesture.velocity(in: notification).y < 0{
+            if gesture.velocity(in: notificationView).y < 0{
                 notificationTimerExpired()
             }
             else{
-                notification.isExtended = true
-                notification.moveToFinalPosition(animated: true, completion: nil)
+                notificationView.isExtended = true
+                notificationView.moveToFinalPosition(animated: true, completion: nil)
             }
         default:
             break
@@ -78,7 +71,7 @@ class FNotificationManager: NSObject {
     }
     
     @objc func handleTap(gesture: UITapGestureRecognizer){
-        guard notification.frame.origin.y == -20 else{
+        guard notificationView.frame.origin.y == -20 else{
             return
         }
         tapCompletion?()
@@ -87,180 +80,113 @@ class FNotificationManager: NSObject {
     
     
     func set(newSettings settings: FNotificationSettings){
-        notification.backgroundView               = settings.backgroundView
-        notification.titleLabel.textColor         = settings.titleTextColor
-        notification.subtitleLabel.textColor      = settings.subtitleTextColor
-        notification.imageView.layer.cornerRadius = settings.imageViewCornerRadius
-        notification.titleLabel.font              = settings.titleFont
-        notification.subtitleLabel.font           = settings.subtitleFont
-        notification.backgroundColor              = settings.backgroundColor
+        notificationView.backgroundView               = settings.backgroundView
+        notificationView.titleLabel.textColor         = settings.titleTextColor
+        notificationView.subtitleLabel.textColor      = settings.subtitleTextColor
+        notificationView.imageView.layer.cornerRadius = settings.imageViewCornerRadius
+        notificationView.titleLabel.font              = settings.titleFont
+        notificationView.subtitleLabel.font           = settings.subtitleFont
+        notificationView.backgroundColor              = settings.backgroundColor
     }
     
     func show(audioPlayerNotificationWithTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, extensionAudioUrl: String, notificationWasTapped: (()-> Void)?, didPlayRecording: (()-> Void)?){
         let audioPlayerExtension = UINib(nibName: "FNotificationVoicePlayerExtensionView", bundle: nil).instantiate(withOwner: nil, options: nil).first as! FNotificationVoicePlayerExtensionView
-        audioPlayerExtension.dataUrl = extensionAudioUrl
+        audioPlayerExtension.dataUrl          = extensionAudioUrl
         audioPlayerExtension.didPlayRecording = didPlayRecording
-        notification.extensionView = audioPlayerExtension
-        if notificationTimer != nil{
-            self.notificationTimer.invalidate()
-            self.notificationTimer = nil
-        }
-        if UIApplication.shared.isStatusBarHidden{
-            notification.topConstraint.constant = FNotification.topConstraintWithoutStatusBar
-            notification.frame.size.height      = FNotification.heightWithoutStatusBar
-            notification.layoutIfNeeded()
-        }
-        else{
-            notification.topConstraint.constant = FNotification.topConstraintWithStatusBar
-            notification.frame.size.height      = FNotification.heightWithStatusBar
-            notification.layoutIfNeeded()
-        }
-        let window = UIApplication.shared.delegate?.window
-        guard window != nil else{
+        guard notificationView.superview == nil else{
+            notificationQueue.append((FNotification(withTitleText: titleText, subtitleText: subtitleText, image: image, duration: duration, notificationWasTapped: notificationWasTapped), audioPlayerExtension))
             return
         }
-        guard window! != nil else{
-            return
-        }
-        notification.moveToInitialPosition(animated: false, completion: nil)
-        notification.titleLabel.text    = titleText
-        notification.subtitleLabel.text = subtitleText
-        notification.imageView.image    = image
-        window!!.addSubview(notification)
-        tapCompletion = notificationWasTapped
-        notification.moveToFinalPosition(animated: true) {
-            if self.notificationTimer != nil{
-                self.notificationTimer.invalidate()
-                self.notificationTimer = nil
-            }
-            self.notificationTimer = Timer.scheduledTimer(timeInterval: duration,
-                                                          target: self,
-                                                          selector: #selector(self.notificationTimerExpired),
-                                                          userInfo: nil,
-                                                          repeats: false)
-        }
-
+        notificationView.extensionView            = audioPlayerExtension
         
+        defaultShow(withTitleText: titleText,
+                    subtitleText: subtitleText,
+                    image: image,
+                    andDuration: duration,
+                    notificationWasTapped: notificationWasTapped)
     }
     
     func show(imageNotificationWithTitleText  titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, extensionImage: UIImage, notificationWasTapped: (()-> Void)?){
         let imageViewExtentionView = FNotificationImageExtensionView()
         imageViewExtentionView.imageView.image = extensionImage
-        notification.extensionView = imageViewExtentionView
-        if notificationTimer != nil{
-            self.notificationTimer.invalidate()
-            self.notificationTimer = nil
-        }
-        if UIApplication.shared.isStatusBarHidden{
-            notification.topConstraint.constant = FNotification.topConstraintWithoutStatusBar
-            notification.frame.size.height      = FNotification.heightWithoutStatusBar
-            notification.layoutIfNeeded()
-        }
-        else{
-            notification.topConstraint.constant = FNotification.topConstraintWithStatusBar
-            notification.frame.size.height      = FNotification.heightWithStatusBar
-            notification.layoutIfNeeded()
-        }
-        let window = UIApplication.shared.delegate?.window
-        guard window != nil else{
+        guard notificationView.superview == nil else{
+            notificationQueue.append((FNotification(withTitleText: titleText, subtitleText: subtitleText, image: image, duration: duration, notificationWasTapped: notificationWasTapped), imageViewExtentionView))
             return
         }
-        guard window! != nil else{
-            return
-        }
-        notification.moveToInitialPosition(animated: false, completion: nil)
-        notification.titleLabel.text    = titleText
-        notification.subtitleLabel.text = subtitleText
-        notification.imageView.image    = image
-        window!!.addSubview(notification)
-        tapCompletion = notificationWasTapped
-        notification.moveToFinalPosition(animated: true) {
-            if self.notificationTimer != nil{
-                self.notificationTimer.invalidate()
-                self.notificationTimer = nil
-            }
-            self.notificationTimer = Timer.scheduledTimer(timeInterval: duration,
-                                                          target: self,
-                                                          selector: #selector(self.notificationTimerExpired),
-                                                          userInfo: nil,
-                                                          repeats: false)
-        }
+        notificationView.extensionView = imageViewExtentionView
+        defaultShow(withTitleText: titleText,
+                    subtitleText: subtitleText,
+                    image: image,
+                    andDuration: duration,
+                    notificationWasTapped: notificationWasTapped)
     }
     
     func show(textFieldNotificationWithTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, notificationWasTapped: (()-> Void)?, accessoryTextFieldButtonPressed: ((_ text: String)-> Void)?){
         let textFieldExtensionView = UINib(nibName: "FNotificationTextFieldExtensionView", bundle: nil).instantiate(withOwner: nil, options: nil).first as! FNotificationTextFieldExtensionView
         textFieldExtensionView.sendButtonPressed = accessoryTextFieldButtonPressed
-        notification.extensionView = textFieldExtensionView
-        if notificationTimer != nil{
-            self.notificationTimer.invalidate()
-            self.notificationTimer = nil
-        }
-        if UIApplication.shared.isStatusBarHidden{
-            notification.topConstraint.constant = FNotification.topConstraintWithoutStatusBar
-            notification.frame.size.height      = FNotification.heightWithoutStatusBar
-            notification.layoutIfNeeded()
-        }
-        else{
-            notification.topConstraint.constant = FNotification.topConstraintWithStatusBar
-            notification.frame.size.height      = FNotification.heightWithStatusBar
-            notification.layoutIfNeeded()
-        }
-        let window = UIApplication.shared.delegate?.window
-        guard window != nil else{
+        guard notificationView.superview == nil else{
+            notificationQueue.append((FNotification(withTitleText: titleText, subtitleText: subtitleText, image: image, duration: duration, notificationWasTapped: notificationWasTapped), textFieldExtensionView))
             return
         }
-        guard window! != nil else{
-            return
-        }
-        notification.moveToInitialPosition(animated: false, completion: nil)
-        notification.titleLabel.text    = titleText
-        notification.subtitleLabel.text = subtitleText
-        notification.imageView.image    = image
-        window!!.addSubview(notification)
-        tapCompletion = notificationWasTapped
-        notification.moveToFinalPosition(animated: true) {
-            if self.notificationTimer != nil{
-                self.notificationTimer.invalidate()
-                self.notificationTimer = nil
-            }
-            self.notificationTimer = Timer.scheduledTimer(timeInterval: duration,
-                                                          target: self,
-                                                          selector: #selector(self.notificationTimerExpired),
-                                                          userInfo: nil,
-                                                          repeats: false)
-        }
+        notificationView.extensionView = textFieldExtensionView
+        defaultShow(withTitleText: titleText,
+                    subtitleText: subtitleText,
+                    image: image,
+                    andDuration: duration,
+                    notificationWasTapped: notificationWasTapped)
     }
     
     func show(withTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, notificationWasTapped: (()-> Void)?){
-        notification.extensionView = nil
+        guard notificationView.superview == nil else{
+            notificationQueue.append((FNotification(withTitleText: titleText, subtitleText: subtitleText, image: image, duration: duration, notificationWasTapped: notificationWasTapped), nil))
+            return
+        }
+        notificationView.extensionView = nil
+        defaultShow(withTitleText: titleText,
+                    subtitleText: subtitleText,
+                    image: image,
+                    andDuration: duration,
+                    notificationWasTapped: notificationWasTapped)
+    }
+    
+    func show(notification: FNotification,  withExtensionView extensionView: FNotificationExtensionView, notificationWasTapped: (()-> Void)?, extensionViewInteractionHandlers:(()-> Void)...){
+        guard notificationView.superview == nil else{
+            notificationQueue.append((notification, nil))
+            return
+        }
+        notificationView.extensionView = extensionView
+        defaultShow(withTitleText: notification.titleText,
+                    subtitleText: notification.subtitleText,
+                    image: notification.image,
+                    andDuration: notification.duration,
+                    notificationWasTapped: notificationWasTapped)
+    }
+    func defaultShow(withTitleText titleText: String = "", subtitleText: String = "", image: UIImage? = nil, andDuration duration: TimeInterval = 5, notificationWasTapped: (()-> Void)?){
+        notificationView.moveToInitialPosition(animated: false, completion: nil)
+        notificationView.titleLabel.text    = titleText
+        notificationView.subtitleLabel.text = subtitleText
+        notificationView.imageView.image    = image
+        tapCompletion = notificationWasTapped
         if notificationTimer != nil{
             self.notificationTimer.invalidate()
             self.notificationTimer = nil
         }
         if UIApplication.shared.isStatusBarHidden{
-            notification.topConstraint.constant = FNotification.topConstraintWithoutStatusBar
-            notification.frame.size.height      = FNotification.heightWithoutStatusBar
-            notification.layoutIfNeeded()
+            notificationView.topConstraint.constant = FNotificationView.topConstraintWithoutStatusBar
+            notificationView.frame.size.height      = FNotificationView.heightWithoutStatusBar
+            notificationView.layoutIfNeeded()
         }
         else{
-            notification.topConstraint.constant = FNotification.topConstraintWithStatusBar
-            notification.frame.size.height      = FNotification.heightWithStatusBar
-            notification.layoutIfNeeded()
+            notificationView.topConstraint.constant = FNotificationView.topConstraintWithStatusBar
+            notificationView.frame.size.height      = FNotificationView.heightWithStatusBar
+            notificationView.layoutIfNeeded()
         }
-        let window = UIApplication.shared.delegate?.window
-        guard window != nil else{
+        guard case let window?? = UIApplication.shared.delegate?.window else{
             return
         }
-        guard window! != nil else{
-            return
-        }
-        notification.moveToInitialPosition(animated: false, completion: nil)
-        notification.titleLabel.text    = titleText
-        notification.subtitleLabel.text = subtitleText
-        notification.imageView.image    = image
-        window!!.addSubview(notification)
-        tapCompletion = notificationWasTapped
-        notification.moveToFinalPosition(animated: true) {
+        
+        window.addSubview(notificationView)
+        notificationView.moveToFinalPosition(animated: true) {
             if self.notificationTimer != nil{
                 self.notificationTimer.invalidate()
                 self.notificationTimer = nil
@@ -272,12 +198,29 @@ class FNotificationManager: NSObject {
                                                           repeats: false)
         }
     }
-    
-    @objc private func notificationTimerExpired(){
-        notification.moveToInitialPosition(animated: true){
-            self.notification.removeFromSuperview()
-            self.notification.extensionView = nil
+    private func dequeueAndDisplayNotification(){
+        guard notificationQueue.count != 0 else{
+            return
         }
+        let notificationTuple = notificationQueue.removeFirst()
+        notificationView.extensionView = notificationTuple.1
+        defaultShow(withTitleText: notificationTuple.0.titleText, subtitleText: notificationTuple.0.subtitleText, image: notificationTuple.0.image, andDuration: notificationTuple.0.duration, notificationWasTapped: notificationTuple.0.notificationWasTapped)
+    }
+    @objc private func notificationTimerExpired(){
+        notificationView.moveToInitialPosition(animated: true){
+            self.notificationView.removeFromSuperview()
+            self.notificationView.extensionView = nil
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + FNotificationManager.shared.pauseBetweenNotifications, execute: {
+                self.dequeueAndDisplayNotification()
+            })
+        }
+    }
+    func removeCurrentNotification(){
+        notificationTimerExpired()
+    }
+    func removeAllNotifications(){
+        notificationQueue = []
+        notificationTimerExpired()
     }
 }
 extension FNotificationManager: UIGestureRecognizerDelegate{

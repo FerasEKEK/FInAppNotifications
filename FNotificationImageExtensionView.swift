@@ -16,7 +16,9 @@ class FNotificationImageExtensionView: FNotificationExtensionView {
         setupImageView()
         backgroundColor = .clear
     }
-    
+    override var height: CGFloat{
+        return 200
+    }
     required init?(coder aDecoder: NSCoder) {
         imageView = UIImageView()
         super.init(coder: aDecoder)

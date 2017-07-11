@@ -12,6 +12,9 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
     var audioPlayer                   : AVPlayer!
     var timeObserver                  : Any?
     var didPlayRecording              : (()-> Void)?
+    override var height  : CGFloat{
+        return 100
+    }
     var dataUrl: String!{
         didSet{
             guard dataUrl != nil else {
@@ -127,7 +130,7 @@ class FNotificationVoicePlayerExtensionView: FNotificationExtensionView {
         if timeObserver != nil{
             audioPlayer.removeTimeObserver(timeObserver!)
         }
-        audioPlayer.currentItem?.seek(to: CMTime(seconds: Double(sender.value), preferredTimescale: 1), completionHandler: { (Bool) in
+        audioPlayer.currentItem?.seek(to: CMTime(seconds: Double(sender.value)+0.5, preferredTimescale: 1), completionHandler: { (Bool) in
             guard self.audioPlayer != nil else{
                 return
             }

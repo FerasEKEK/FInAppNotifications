@@ -10,12 +10,15 @@ import UIKit
 class FNotificationTextFieldExtensionView: FNotificationExtensionView {
     @IBOutlet weak var textField : UITextField!
     @IBOutlet weak var sendButton: UIButton!
+    override var height: CGFloat{
+        return 40
+    }
     var sendButtonPressed        : ((_ text: String)-> Void)?
     @IBAction func sendButtonPressed(_ sender: UIButton) {
         sendButtonPressed?(textField.text ?? "")
-        self.notification?.moveToInitialPosition(animated: true){
-            self.notification?.removeFromSuperview()
-            self.notification?.extensionView = nil
+        self.notificationView?.moveToInitialPosition(animated: true){
+            self.notificationView?.removeFromSuperview()
+            self.notificationView?.extensionView = nil
         }
     }
 }

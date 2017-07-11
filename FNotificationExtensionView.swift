@@ -8,8 +8,10 @@
 
 import UIKit
 class FNotificationExtensionView: UIView {
-    weak var notification: FNotification?
-    var heightConstraint: NSLayoutConstraint!
+    weak var notificationView: FNotificationView?
+    var height: CGFloat {
+        return 0
+    }
     deinit {
         print("extension view deinited")
     }
