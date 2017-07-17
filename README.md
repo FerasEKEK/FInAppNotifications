@@ -1,6 +1,6 @@
 **FInAppNotifications** 
 ===
-In app notifications for ios written using swift. Supports textfield, images, audio, and normal notifications 
+In app notifications for ios written using swift. Supports textfield, images, audio, and normal notifications. Custom Extension Views can be implemented to add additional functionality. Also contains a notification queue. 
 
 **What it looks like**
 =
